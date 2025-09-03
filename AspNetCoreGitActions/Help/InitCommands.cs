@@ -25,4 +25,3 @@
 
 // In Visual Studio настройка GitHub Actions:
 // Новый файл в проекте: "AspNetCoreGitActions/.github/workflows/ci.yml"
-

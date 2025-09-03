@@ -53,7 +53,7 @@ var context = app.Services.CreateScope().ServiceProvider.GetRequiredService<Todo
 context.Database.EnsureCreated();
 
 ////////////////////////////////////////////////////////////////////////////////
-// Init minimal APIs
+// Init minimal APIs for ToDo model
 ////////////////////////////////////////////////////////////////////////////////
 
 // GET: /todos
@@ -109,6 +109,74 @@ app.MapDelete("/todos/{id}", async (int id, TodoContext db) =>
     return Results.NotFound();
 })
 .WithName("DeleteTodo")
+.WithOpenApi();
+
+////////////////////////////////////////////////////////////////////////////////
+// Init minimal APIs for Car model
+////////////////////////////////////////////////////////////////////////////////
+
+// GET: /cars
+app.MapGet("/cars", async (TodoContext db) =>
+    await db.Cars.ToListAsync())
+    .WithName("GetCars")
+    .WithOpenApi();
+
+// GET: /cars/{id}
+app.MapGet("/cars/{id}", async (int id, TodoContext db) =>
+    await db.Cars.FindAsync(id)
+        is Car car
+            ? Results.Ok(car)
+            : Results.NotFound())
+    .WithName("GetCar")
+    .WithOpenApi();
+
+// POST: /cars
+app.MapPost("/cars", async (Car car, TodoContext db) =>
+{
+    // Проверка уникальности номера
+    if (await db.Cars.AnyAsync(c => c.LicensePlate == car.LicensePlate))
+        return Results.BadRequest("License plate already exists.");
+
+    db.Cars.Add(car);
+    await db.SaveChangesAsync();
+    return Results.Created($"/cars/{car.Id}", car);
+})
+.WithName("CreateCar")
+.WithOpenApi();
+
+// PUT: /cars/{id}
+app.MapPut("/cars/{id}", async (int id, Car inputCar, TodoContext db) =>
+{
+    var car = await db.Cars.FindAsync(id);
+    if (car is null) return Results.NotFound();
+
+    // Запрещаем менять номерной знак
+    if (car.LicensePlate != inputCar.LicensePlate)
+        return Results.BadRequest("License plate cannot be changed.");
+
+    car.Make = inputCar.Make;
+    car.Model = inputCar.Model;
+    car.Year = inputCar.Year;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+})
+.WithName("UpdateCar")
+.WithOpenApi();
+
+// DELETE: /cars/{id}
+app.MapDelete("/cars/{id}", async (int id, TodoContext db) =>
+{
+    if (await db.Cars.FindAsync(id) is Car car)
+    {
+        db.Cars.Remove(car);
+        await db.SaveChangesAsync();
+        return Results.Ok();
+    }
+
+    return Results.NotFound();
+})
+.WithName("DeleteCar")
 .WithOpenApi();
 
 ////////////////////////////////////////////////////////////////////////////////
