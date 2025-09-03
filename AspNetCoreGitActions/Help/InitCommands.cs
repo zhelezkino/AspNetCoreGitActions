@@ -24,6 +24,5 @@
 // git push -u origin main
 
 // In Visual Studio настройка GitHub Actions:
-// Новый файл в проекте: .github/workflows/ci.yml
-// ProjectList - Add - New Folder - ".github" - "workflows"
-// "workflows" - Add - New Item - ci.yml 
+// Новый файл в проекте: "AspNetCoreGitActions/.github/workflows/ci.yml"
+
