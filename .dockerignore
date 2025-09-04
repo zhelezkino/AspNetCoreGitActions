@@ -1,0 +1,12 @@
+.git
+.gitignore
+.vscode
+*.swp
+Dockerfile
+.dockerignore
+bin/
+obj/
+out/
+.github/
+**/*.user
+**/*.suo
